@@ -1,0 +1,51 @@
+Project OO Programmeren:
+Bibliotheekbeheersysteem
+Doel van de opdracht
+Het doel van deze opdracht is om een objectgeoriënteerd bibliotheekbeheersysteem te maken in C#.
+Volgende functies zal je onder meer moeten implementeren:
+•
+•
+•
+•
+•
+•
+
+Het toevoegen van nieuwe boeken aan de bibliotheek.
+Het verwijderen van boeken uit de bibliotheek.
+Het zoeken naar boeken.
+Het uitlenen van boeken.
+Het terugbrengen van geleende boeken.
+...
+
+Vereisten
+De toepassing (wat de gebruiker ziet) is in het Nederlands maar alle identifiers geef je Engelse
+namen.
+Als er een property gevraagd wordt, wordt altijd een full property bedoeld met achterliggend private
+field.
+Volg bij het ontwikkelen van je toepassing de afspraken die gemaakt werden tijdens de labo’s.
+Zorg ervoor dat de toepassing gebruiksvriendelijk is.
+Samen met de code, maak je in een Word-document de klassediagrammen van je oplossing. Deze
+klassediagrammen moeten de informatie tonen zoals gebruikt tijdens de labo’s.
+Je dient jouw oplossing in via de indienlink op Digitap in de vorm van een zip-file.
+De oplossing die je indient, moet jouw eigen, persoonlijke oplossing zijn. Er kunnen dus geen 2
+dezelfde oplossingen voorkomen (plagiaat wordt als fraude beschouwd; zie OER art.21.1).
+De projectopdracht wordt ingedeeld in deelopdrachten. De deadlines voor het indienen van elke
+deelopdracht, kan je terug vinden in de planning. Te laat indienen van een deelopdracht is 0 voor dat
+deel.
+Na het indienen van een deelopdracht wordt er klassikaal feedback gegeven. Je kan ook individuele
+feedback vragen. Het is de bedoeling dat je met deze feedback rekening houdt bij het indienen van
+het volgende deel en dat je de nodige aanpassingen doet.
+De eindevaluatie gebeurt tijdens de laatste lesweek (laatste 2 labo’s): elke student stelt haar/zijn
+project voor aan de lector en geeft uitleg over de code en de werking. Dit gebeurt enkel on campus
+tijdens het labo; je bent dus verplicht aanwezig.
+Evaluatiecriteria zijn:
+-
+
+het foutloos werken van het programma
+het voldoen aan alle gevraagde opdrachten en functionaliteiten
+de gebruiksvriendelijkheid van de toepassing
+de mondelinge voorstelling van de toepassing en de uitleg over de code
+
+1
+
+

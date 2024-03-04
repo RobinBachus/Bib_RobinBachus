@@ -1,0 +1,60 @@
+Opdracht project OO Programmeren – deel 1
+Maak een project Bib_Je_eigen_naam (vb: Bib_JohnDoe).
+
+Book
+Ontwerp de klasse Book.
+Denk zelf na over de eigenschappen (minstens 8) die deze klasse moet hebben. Het ISBN nummer
+hoort daar zeker bij. Gebruik ook het genre als eigenschap en maak hier een enumeration voor. Kies
+zelf enkele genres waaruit je kan kiezen.
+Zorg voor controles (minstens 4) op het toewijzen van waarden van deze eigenschappen.
+Bijvoorbeeld: de titel van een boek mag niet leeg zijn, het ISBN-nummer moet voldoen aan bepaalde
+voorwaarden, …
+Zorg voor een constructor met titel, auteur en een bibliotheek (zie verder klasse Library).
+Voeg methoden toe om:
+-
+
+Alle info van een boek te tonen. Doe dit op een duidelijke en aantrekkelijke manier zonder te
+overdrijven in de opmaak.
+Op basis van een csv-bestand (dit is de parameter) een aantal boeken te deserialiseren. Stel
+zelf een csv-bestand samen en dien dit mee in bij je oplossing.
+
+Library
+Ontwerp de klasse Library.
+Een Library heeft een naam en moet zeker een lijst van Book-objecten bevatten. Een boek wordt
+automatisch toegevoegd aan deze lijst als het Book-object gemaakt wordt.
+Voorzie hiervoor een constructor.
+Voorzie methoden om:
+-
+
+Een boek-object te verwijderen uit de bibliotheek (= uit de lijst van boeken)
+Een boek te zoeken op basis van titel en auteur (geeft een book terug).
+Een boek te zoeken op basis van ISBN (geeft een book terug)
+Al de boeken van een auteur te zoeken (geeft een lijst van book’s terug)
+Al de boeken te zoeken die voldoen aan een waarde van één van je extra eigenschappen
+(geeft een lijst van book’s terug)
+
+Menu
+Bij de start van de toepassing wordt er eerst een nieuwe bibliotheek gemaakt; geef deze een gepaste
+naam.
+Maak vervolgens een keuzemenu in de toepassing om:
+-
+
+Een boek toe te voegen aan de bibliotheek op basis van titel en auteur.
+Om informatie aan een boek toe te voegen: het ISBN, of het genre, of minstens één van je
+extra eigenschappen
+Alle info van een boek te tonen op basis van ingegeven titel en auteur.
+
+1
+
+-
+
+Een boek op te zoeken op verschillende manieren. Toon van het gevonden boek(-en) de titel
+en de auteur.
+Een boek te verwijderen uit de bibliotheek.
+Alle boeken te tonen uit de bibliotheek met titel en auteur.
+
+Dit keuzemenu moet blijven loopen totdat je exit ingeeft.
+
+2
+
+
