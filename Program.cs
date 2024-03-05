@@ -1,13 +1,11 @@
-﻿using System;
-
-namespace Bib_RobinBachus
+﻿namespace Bib_RobinBachus
 {
-	internal class Program
+    internal class Program
 	{
-		public static void Main(string[] args)
+		public static void Main()
 		{
 			Library library = new("Infernal Forest");
-			Book.LoadFromCsv(@"C:\Users\robin\Desktop\Projects\Bib_RobinBachus\Data\Books.csv");
+			Book.LoadFromCsv(@".\Data\Books.csv");
 
 			bool exit;
 			do exit = ShowMenu(library);
@@ -52,7 +50,7 @@ namespace Bib_RobinBachus
 					SearchBook();
 					break;
 				case 5:
-					ulong isbn = Prompt<ulong>("ISBN: ", "Ongeldige ISBN. Probeer opnieuw.");
+					ulong isbn = PromptIsbn();
 					Console.WriteLine(Library.RemoveBook(isbn) ? "Boek verwijderd." : "Boek niet gevonden.");
 					break;
 				case 6:
@@ -90,7 +88,7 @@ namespace Bib_RobinBachus
 			switch (choice)
 			{
 				case 1:
-					ulong isbn = Prompt<ulong>("ISBN: ", "Ongeldige ISBN. Probeer opnieuw.");
+					ulong isbn = PromptIsbn();
 					Book? book = Library.FindBook(isbn);
 					if (book is null)
 					{
@@ -200,7 +198,7 @@ namespace Bib_RobinBachus
 		private static bool MakeBook()
 		{
 
-			ulong isbn = Prompt<ulong>("ISBN: ", "Ongeldige ISBN. Probeer opnieuw.");
+			ulong isbn = PromptIsbn();
 			string title = Prompt("Titel: ");
 			string author = Prompt("Auteur: ");
 			double price = Prompt<double>("Prijs: ", "Ongeldige prijs. Probeer opnieuw.");
@@ -279,7 +277,7 @@ namespace Bib_RobinBachus
 			return parsed;
 		}
 
-		private static ulong? PromptIsbn()
+		private static ulong PromptIsbn()
 		{
 			bool exit = false;
 			ulong parsed = 0;
@@ -288,6 +286,16 @@ namespace Bib_RobinBachus
 			{
 				Console.Write("ISBN: ");
 				exit = TryParse(Console.ReadLine(), out parsed);
+                try
+                {
+                    if (exit) exit = Book.IsValidIsbn(parsed);
+					if (!exit) Console.WriteLine("Ongeldige ISBN. Probeer opnieuw.");
+                }
+                catch (ArgumentOutOfRangeException e)
+                {
+                    Console.WriteLine(e.Message);
+                    exit = false;
+                }
 			}
 
 			return parsed;

@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Bib_RobinBachus
 {
-	internal class Book
+    internal class Book
 	{
 
 		private ulong isbnNumber;
@@ -16,8 +16,10 @@ namespace Bib_RobinBachus
 				if (!IsValidIsbn(value))
 				{
 					isbnNumber = 0;
-					Console.WriteLine($"Invalid ISBN. Keeping current value: {isbnNumber}");
-					return;
+
+                    Console.WriteLine($"{value}: {title} - {author}");
+                    //Console.WriteLine($"Invalid ISBN: '{IsValidIsbn(value)}'. Keeping current value: {isbnNumber}");
+                    return;
 				}
 				isbnNumber = value;
 			}
@@ -51,7 +53,7 @@ namespace Bib_RobinBachus
 			}
 		}
 
-		private bool hasMatureRating = false;
+		private bool hasMatureRating;
 		public bool HasMatureRating
 		{
 			get => hasMatureRating;
@@ -83,19 +85,19 @@ namespace Bib_RobinBachus
 
 		public Book(ulong isbn, string title, string author, double price)
 		{
-			IsbnNumber = isbn;
 			Title = title;	
 			Author = author;
 			Price = price;
+			IsbnNumber = isbn;
 
 			Library.Books.Add(this);
 		}
 
 		public static List<Book> LoadFromCsv(string filePath)
 		{
-			string[] lines = File.ReadAllLines(filePath);
+			string[] lines = File.ReadAllLines(Path.GetFullPath(filePath));
 
-			List<Book> books = lines
+            List<Book> books = lines
 				.Select(row => row.Split(';'))
 				.Select(columnValues => new Book(
 					ulong.Parse(columnValues[0]),
@@ -131,10 +133,13 @@ namespace Bib_RobinBachus
 		public static bool IsValidIsbn(ulong isbn)
 		{
 			int digits = (int)Math.Floor(Math.Log10(isbn) + 1);
-			if (digits is not (10 or 13)) return false;
+            if (digits is 10 or 13) 
+                return digits == 10 
+                    ? Isbn10ChecksumValid(isbn) 
+                    : Isbn13ChecksumValid(isbn);
 
-			return digits == 10 ? Isbn10ChecksumValid(isbn) : Isbn13ChecksumValid(isbn);
-		}
+			throw new ArgumentOutOfRangeException(nameof(isbn), $"ISBN must be 10 or 13 digits long. (Validating: {isbn})");
+        }
 
 		// https://en.wikipedia.org/wiki/ISBN#ISBN-13_check_digit_calculation
 		public static bool Isbn13ChecksumValid(ulong isbn)

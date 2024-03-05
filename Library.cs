@@ -36,11 +36,11 @@ namespace Bib_RobinBachus
 			
 		public static Book? FindBook(string author, string title)
 		{
-			List<Book> books = Library.books.FindAll(book => book.Author == author && book.Title == title);
-			switch (books.Count)
+			List<Book> results = Library.books.FindAll(book => book.Author == author && book.Title == title);
+			switch (results.Count)
 			{
 				case 1:
-					return books[0];
+					return results[0];
 				case 0:
 					Console.WriteLine("Geen boeken gevonden");
 					return null;
@@ -48,9 +48,9 @@ namespace Bib_RobinBachus
 
 			Console.WriteLine("Meerdere boeken gevonden, gelieve een keuze te maken");
 			int i = 1;
-			books.ForEach(b => Console.WriteLine($"{i++}. {b.Header}"));
-			if (int.TryParse(Console.ReadLine(), out int choice) && choice >= 1 && choice <= books.Count)
-				return books[choice - 1];
+			results.ForEach(b => Console.WriteLine($"{i++}. {b.Header}"));
+			if (int.TryParse(Console.ReadLine(), out int choice) && choice >= 1 && choice <= results.Count)
+				return results[choice - 1];
 			Console.WriteLine("Ongeldige keuze. Probeer opnieuw.");
 			return null;
 
