@@ -83,17 +83,17 @@ namespace Bib_RobinBachus
 
 		public string Header => $"{Title} by {Author} ({Type})";
 
-		public Book(string isbn, string title, string author, double price)
+		public Book(string isbn, string title, string author, double price, Library library)
 		{
 			Title = title;	
 			Author = author;
 			Price = price;
 			IsbnNumber = isbn;
 
-			Library.Books.Add(this);
-		}
+            library.Books.Add(this);
+        }
 
-		public static List<Book> LoadFromCsv(string filePath)
+		public static List<Book> LoadFromCsv(string filePath, Library library)
 		{
 			string[] lines = File.ReadAllLines(Path.GetFullPath(filePath));
 
@@ -103,7 +103,8 @@ namespace Bib_RobinBachus
 					columnValues[0],
 					columnValues[1],
 					columnValues[2],
-					double.Parse(columnValues[3], new CultureInfo("en-US"))
+					double.Parse(columnValues[3], new CultureInfo("en-US")),
+					library
 				)
 				{
 					PublishDate = DateTime.Parse(columnValues[4]),

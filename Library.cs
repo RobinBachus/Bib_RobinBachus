@@ -7,6 +7,7 @@ namespace Bib_RobinBachus
 {
 	internal class Library
 	{
+		// Properties
 		private string name;
 		public string Name
 		{
@@ -14,15 +15,15 @@ namespace Bib_RobinBachus
 			set => name = value;
 		}
 
-		private static List<Book> books = new();
-		public static List<Book> Books
+		private List<Book> books = new();
+		public List<Book> Books
 		{
 			get => books;
 			set => books = value;
 		}
 
-
-		public static double LowestPrice
+		// Calculated properties
+		public double LowestPrice
 		{
 			get
 			{
@@ -30,8 +31,7 @@ namespace Bib_RobinBachus
 				return books.Min(book => book.Price);
 			}
 		}
-
-		public static double HighestPrice
+		public double HighestPrice
 		{
 			get
 			{
@@ -40,24 +40,25 @@ namespace Bib_RobinBachus
 			}
 		}
 
+
 		public Library(string name)
 		{
 			this.name = name;
 		}
 
-		public static bool RemoveBook(string isbn)
+		public bool RemoveBook(string isbn)
 		{
 			return 0 != books.RemoveAll(book => book.IsbnNumber == isbn);
 		}
 
-		public static Book? FindBook(string isbn)
+		public Book? FindBook(string isbn)
 		{
 			return books.Find(book => book.IsbnNumber == isbn);
 		}
 			
-		public static Book? FindBook(string author, string title)
+		public Book? FindBook(string author, string title)
 		{
-			List<Book> results = Library.books.FindAll(book => book.Author == author && book.Title == title);
+			List<Book> results = books.FindAll(book => book.Author == author && book.Title == title);
 			switch (results.Count)
 			{
 				case 1:
@@ -78,12 +79,12 @@ namespace Bib_RobinBachus
 
 		}
 
-		public static List<Book> FindBooks(string author)
+		public List<Book> FindBooks(string author)
 		{
 			return books.FindAll(book => book.Author == author);
 		}
 
-		public static List<Book> FindBooks(double minPrice, double maxPrice)
+		public List<Book> FindBooks(double minPrice, double maxPrice)
 		{
 			return books.FindAll(book => book.Price >= minPrice && book.Price <= maxPrice);
 		}

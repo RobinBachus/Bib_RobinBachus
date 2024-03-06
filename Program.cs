@@ -10,14 +10,14 @@ namespace Bib_RobinBachus
 		{
 			Library library = new("Infernal Forest");
 
-			Init();
+			Init(library);
 
 			bool exit;
 			do exit = ShowMenu(library);
 			while (!exit);
 		}
 
-		private static void Init()
+		private static void Init(Library library)
 		{
 			bool useCsv = PromptBool("Use CSV for data?");
 			if (!useCsv)
@@ -30,12 +30,12 @@ namespace Bib_RobinBachus
 			Console.WriteLine($"\nCurrent CSV: {Path.GetFullPath(DEFAULT_PATH)}");
 			bool useDefaultCsv = PromptBool("Load this data?");
 
-			LoadData(useDefaultCsv ? DEFAULT_PATH : null);
+			LoadData(library, useDefaultCsv ? DEFAULT_PATH : null);
 
 			PromptKey();
 		}
 
-		private static void LoadData(string? path = null)
+		private static void LoadData(Library library, string? path = null)
 		{
 			path ??= Prompt("Path to CSV: ");
 
@@ -52,8 +52,8 @@ namespace Bib_RobinBachus
 				File.Create(path).Close();
 			}
 
-			Book.LoadFromCsv(path);
-			Console.WriteLine($"{Library.Books.Count} books loaded!");
+            int count = Book.LoadFromCsv(path, library).Count;
+			Console.WriteLine($"{count} books loaded!");
 		}
 
 		/// <summary>
@@ -83,28 +83,28 @@ namespace Bib_RobinBachus
 				case 1:
 					bool exit = false;
 					while (!exit)
-						exit = MakeBook();
+						exit = MakeBook(library);
 					break;
 				case 2:
-					AddInfoToBook();
+					AddInfoToBook(library);
 					break;
 				case 3:
-					Console.WriteLine(FindBook());
+					Console.WriteLine(FindBook(library));
 					break;
 				case 4:
-					SearchBook();
+					SearchBook(library);
 					break;
 				case 5:
 					string isbn = PromptIsbn();
-					Console.WriteLine(Library.RemoveBook(isbn) ? "Boek verwijderd." : "Boek niet gevonden.");
+					Console.WriteLine(library.RemoveBook(isbn) ? "Boek verwijderd." : "Boek niet gevonden.");
 					break;
 				case 6:
-					Library
+					library
 						.Books
 						.ForEach(b => Console.WriteLine(b.Header));
 					break;
 				case 7:
-					LoadData();
+					LoadData(library);
 					break;
 				case 0:
 					return true;
@@ -118,7 +118,7 @@ namespace Bib_RobinBachus
 			return false;
 		}
 
-		private static void SearchBook()
+		private static void SearchBook(Library library)
 		{
 			Console.WriteLine("Waarop wil je zoeken?");
 			Console.WriteLine("1. ISBN");
@@ -135,7 +135,7 @@ namespace Bib_RobinBachus
 			{
 				case 1:
 					string isbn = PromptIsbn();
-					Book? book = Library.FindBook(isbn);
+					Book? book = library.FindBook(isbn);
 					if (book is null)
 					{
 						Console.WriteLine("Boek niet gevonden.");
@@ -148,7 +148,7 @@ namespace Bib_RobinBachus
 				case 2:
 					string author = Prompt("Auteur: ");
 
-					List<Book> books = Library.FindBooks(author);
+					List<Book> books = library.FindBooks(author);
 					if (books.Count == 0)
 					{
 						Console.WriteLine("Geen boeken gevonden");
@@ -159,10 +159,10 @@ namespace Bib_RobinBachus
 					break;
 
 				case 3:
-					double minPrice = PromptRange("Minimumprijs: ", Library.LowestPrice, Library.HighestPrice);
-					double maxPrice = PromptRange("Minimumprijs: ", minPrice, Library.HighestPrice);
+					double minPrice = PromptRange("Minimumprijs: ", library.LowestPrice, library.HighestPrice);
+					double maxPrice = PromptRange("Minimumprijs: ", minPrice, library.HighestPrice);
 
-					books = Library.FindBooks(minPrice, maxPrice);
+					books = library.FindBooks(minPrice, maxPrice);
 					if (books.Count == 0)
 					{
 						Console.WriteLine("Geen boeken gevonden");
@@ -183,9 +183,9 @@ namespace Bib_RobinBachus
 			static void ShowHeaders(Book b) => Console.WriteLine(b.Header);
 		}
 
-		private static void AddInfoToBook()
+		private static void AddInfoToBook(Library library)
 		{
-			Book book = FindBook();
+			Book book = FindBook(library);
 			Console.WriteLine("Wat wil je toevoegen?");
 			Console.WriteLine("1. Uitgeefdatum");
 			Console.WriteLine("2. Genre");
@@ -241,7 +241,7 @@ namespace Bib_RobinBachus
 			}
 		}
 
-		private static bool MakeBook()
+		private static bool MakeBook(Library library)
 		{
 
 			string isbn = PromptIsbn();
@@ -249,26 +249,24 @@ namespace Bib_RobinBachus
 			string author = Prompt("Auteur: ");
 			double price = Prompt<double>("Prijs: ", "Ongeldige prijs. Probeer opnieuw.");
 
-			Book book = new(isbn, title, author, price); // Adds to library in the constructor
+			Book book = new(isbn, title, author, price, library);
 
 			Console.WriteLine("Book added!\n");
 			Console.WriteLine(book);
 			return true;
 		}
 		
-		private static Book FindBook()
+		private static Book FindBook(Library library)
 		{
 			Book? book = null;
 			while (book is null){
 				string title = Prompt("Titel: ");
 				string author = Prompt("Auteur: ");
 
-				book = Library.FindBook(author, title);
+				book = library.FindBook(author, title);
 			}
 
 			return book;
 		}
-
-
 	}
 }
