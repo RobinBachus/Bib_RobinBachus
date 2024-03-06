@@ -4,23 +4,22 @@ using System.Reflection;
 
 namespace Bib_RobinBachus
 {
-    internal class Book
+	internal class Book
 	{
 
-		private ulong isbnNumber;
-		public ulong IsbnNumber
+		private string isbnNumber = "Invalid";
+		public string IsbnNumber
 		{
 			get => isbnNumber;
 			set
 			{
-				if (!IsValidIsbn(value))
+				if (!IsValidIsbn(value).isValid)
 				{
-					isbnNumber = 0;
-
-                    Console.WriteLine($"{value}: {title} - {author}");
-                    //Console.WriteLine($"Invalid ISBN: '{IsValidIsbn(value)}'. Keeping current value: {isbnNumber}");
-                    return;
+					Console.WriteLine($"Invalid ISBN: '{value}'. Keeping current value: {isbnNumber}");
+					Console.WriteLine($"Reason: {IsValidIsbn(value).errorMsg}");
+					return;
 				}
+				
 				isbnNumber = value;
 			}
 		}
@@ -67,6 +66,7 @@ namespace Bib_RobinBachus
 			set => publishDate = value;
 		}
 
+
 		private Genre genre = Genre.Misc;
 		public Genre Genre
 		{
@@ -83,7 +83,7 @@ namespace Bib_RobinBachus
 
 		public string Header => $"{Title} by {Author} ({Type})";
 
-		public Book(ulong isbn, string title, string author, double price)
+		public Book(string isbn, string title, string author, double price)
 		{
 			Title = title;	
 			Author = author;
@@ -97,10 +97,10 @@ namespace Bib_RobinBachus
 		{
 			string[] lines = File.ReadAllLines(Path.GetFullPath(filePath));
 
-            List<Book> books = lines
+			List<Book> books = lines
 				.Select(row => row.Split(';'))
 				.Select(columnValues => new Book(
-					ulong.Parse(columnValues[0]),
+					columnValues[0],
 					columnValues[1],
 					columnValues[2],
 					double.Parse(columnValues[3], new CultureInfo("en-US"))
@@ -130,42 +130,39 @@ namespace Bib_RobinBachus
 			else property = value;
 		}
 
-		public static bool IsValidIsbn(ulong isbn)
+		public static (bool isValid, string errorMsg) IsValidIsbn(string isbn)
 		{
-			int digits = (int)Math.Floor(Math.Log10(isbn) + 1);
-            if (digits is 10 or 13) 
-                return digits == 10 
-                    ? Isbn10ChecksumValid(isbn) 
-                    : Isbn13ChecksumValid(isbn);
+			int digits = isbn.Length;
+			if (digits is 10 or 13) 
+				return (
+					digits == 10
+					? Isbn10ChecksumValid(isbn)
+					: Isbn13ChecksumValid(isbn)
+					, $"Invalid ISBN ({isbn})");
 
-			throw new ArgumentOutOfRangeException(nameof(isbn), $"ISBN must be 10 or 13 digits long. (Validating: {isbn})");
-        }
+			return (false, $"ISBN must be 10 or 13 digits long ({isbn})");
+		}
 
 		// https://en.wikipedia.org/wiki/ISBN#ISBN-13_check_digit_calculation
-		public static bool Isbn13ChecksumValid(ulong isbn)
+		public static bool Isbn13ChecksumValid(string isbn)
 		{
-			string isbnString = isbn.ToString();
 			int sum = 0;
-
 			for (int i = 0; i < 13; i++)
 			{
-				int digit = int.Parse(isbnString[i].ToString());
+				int digit = int.Parse(isbn[i].ToString());
 				sum += (i % 2 == 0) ? digit : digit * 3;
 			}
 
 			return sum % 10 == 0;
 		}
 
-		public static bool Isbn10ChecksumValid(ulong isbn)
+		public static bool Isbn10ChecksumValid(string isbn)
 		{
-			string isbnString = isbn.ToString();
-			int sum = 0;
-
-			for (int i = 0; i < 10; i++)
-			{
-				int digit = int.Parse(isbnString[i].ToString());
-				sum += (i + 1) * digit;
-			}
+			int sum = isbn
+				.Select(t => t.ToString().ToLower())
+				.Select(sDigit => sDigit == "x" ? 10 : int.Parse(sDigit))
+				.Select((digit, i) => (i + 1) * digit)
+				.Sum();
 
 			return sum % 11 == 0;
 		}

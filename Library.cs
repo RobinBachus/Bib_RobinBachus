@@ -1,6 +1,8 @@
 ﻿// ReSharper disable ConvertToAutoProperty
 // ReSharper disable ConvertToAutoPropertyWhenPossible
 
+using static Bib_RobinBachus.UserInput;
+
 namespace Bib_RobinBachus
 {
 	internal class Library
@@ -19,17 +21,36 @@ namespace Bib_RobinBachus
 			set => books = value;
 		}
 
+
+		public static double LowestPrice
+		{
+			get
+			{
+				if (books.Count == 0) return 0;
+				return books.Min(book => book.Price);
+			}
+		}
+
+		public static double HighestPrice
+		{
+			get
+			{
+				if (books.Count == 0) return 0;
+				return books.Max(book => book.Price);
+			}
+		}
+
 		public Library(string name)
 		{
 			this.name = name;
 		}
 
-		public static bool RemoveBook(ulong isbn)
+		public static bool RemoveBook(string isbn)
 		{
 			return 0 != books.RemoveAll(book => book.IsbnNumber == isbn);
 		}
 
-		public static Book? FindBook(ulong isbn)
+		public static Book? FindBook(string isbn)
 		{
 			return books.Find(book => book.IsbnNumber == isbn);
 		}
@@ -49,7 +70,8 @@ namespace Bib_RobinBachus
 			Console.WriteLine("Meerdere boeken gevonden, gelieve een keuze te maken");
 			int i = 1;
 			results.ForEach(b => Console.WriteLine($"{i++}. {b.Header}"));
-			if (int.TryParse(Console.ReadLine(), out int choice) && choice >= 1 && choice <= results.Count)
+			int choice = PromptRange("Keuze", 1, results.Count);
+			if (choice >= 1 && choice <= results.Count)
 				return results[choice - 1];
 			Console.WriteLine("Ongeldige keuze. Probeer opnieuw.");
 			return null;

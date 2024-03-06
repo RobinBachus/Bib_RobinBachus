@@ -1,15 +1,59 @@
-﻿namespace Bib_RobinBachus
+﻿using static Bib_RobinBachus.UserInput;
+
+namespace Bib_RobinBachus
 {
-    internal class Program
+	internal class Program
 	{
+		private const string DEFAULT_PATH = "Data/Books.csv";
+
 		public static void Main()
 		{
 			Library library = new("Infernal Forest");
-			Book.LoadFromCsv(@".\Data\Books.csv");
+
+			Init();
 
 			bool exit;
 			do exit = ShowMenu(library);
 			while (!exit);
+		}
+
+		private static void Init()
+		{
+			bool useCsv = PromptBool("Use CSV for data?");
+			if (!useCsv)
+			{
+				Console.WriteLine("Starting without books");
+				PromptKey();
+				return;
+			}
+
+			Console.WriteLine($"\nCurrent CSV: {Path.GetFullPath(DEFAULT_PATH)}");
+			bool useDefaultCsv = PromptBool("Load this data?");
+
+			LoadData(useDefaultCsv ? DEFAULT_PATH : null);
+
+			PromptKey();
+		}
+
+		private static void LoadData(string? path = null)
+		{
+			path ??= Prompt("Path to CSV: ");
+
+			if (!File.Exists(path))
+			{
+				bool createFile = PromptBool($"File not found. Create new file? ({Path.GetFullPath(path)})");
+				if (!createFile)
+				{
+					Console.WriteLine("Starting without books");
+					PromptKey();
+					return;
+				}
+				Console.WriteLine("Creating new file...");
+				File.Create(path).Close();
+			}
+
+			Book.LoadFromCsv(path);
+			Console.WriteLine($"{Library.Books.Count} books loaded!");
 		}
 
 		/// <summary>
@@ -28,9 +72,10 @@
 			Console.WriteLine("4. Zoek een boek op");
 			Console.WriteLine("5. Verwijder een boek");
 			Console.WriteLine("6. Toon alle boeken");
+			Console.WriteLine("7. Laad data van bestand");
 			Console.WriteLine("0. Stoppen");
 
-			int choice = Prompt<int>("\nKeuze: ", "Ongeldige keuze. Probeer opnieuw.");
+			int choice = PromptRange("\nKeuze", 0, 7, "Ongeldige keuze. Probeer opnieuw.");
 			Console.Clear();
 
 			switch (choice)
@@ -50,13 +95,16 @@
 					SearchBook();
 					break;
 				case 5:
-					ulong isbn = PromptIsbn();
+					string isbn = PromptIsbn();
 					Console.WriteLine(Library.RemoveBook(isbn) ? "Boek verwijderd." : "Boek niet gevonden.");
 					break;
 				case 6:
 					Library
 						.Books
-						.ForEach(b => Console.WriteLine($"{b.Title} - {b.Author}"));
+						.ForEach(b => Console.WriteLine(b.Header));
+					break;
+				case 7:
+					LoadData();
 					break;
 				case 0:
 					return true;
@@ -65,9 +113,7 @@
 					break;
 			}
 
-			Console.WriteLine("Press any key to continue...");
-			Console.ReadKey();
-			Console.Clear();
+			PromptKey();
 
 			return false;
 		}
@@ -88,7 +134,7 @@
 			switch (choice)
 			{
 				case 1:
-					ulong isbn = PromptIsbn();
+					string isbn = PromptIsbn();
 					Book? book = Library.FindBook(isbn);
 					if (book is null)
 					{
@@ -113,8 +159,8 @@
 					break;
 
 				case 3:
-					double minPrice = Prompt<double>("Minimumprijs: ", "Ongeldige prijs. Probeer opnieuw.");
-					double maxPrice = Prompt<double>("Maximumprijs: ", "Ongeldige prijs. Probeer opnieuw.");
+					double minPrice = PromptRange("Minimumprijs: ", Library.LowestPrice, Library.HighestPrice);
+					double maxPrice = PromptRange("Minimumprijs: ", minPrice, Library.HighestPrice);
 
 					books = Library.FindBooks(minPrice, maxPrice);
 					if (books.Count == 0)
@@ -198,7 +244,7 @@
 		private static bool MakeBook()
 		{
 
-			ulong isbn = PromptIsbn();
+			string isbn = PromptIsbn();
 			string title = Prompt("Titel: ");
 			string author = Prompt("Auteur: ");
 			double price = Prompt<double>("Prijs: ", "Ongeldige prijs. Probeer opnieuw.");
@@ -223,82 +269,6 @@
 			return book;
 		}
 
-		private static bool TryParse<T>(string? value, out T result, string err = "Ongeldige waarde, probeer opnieuw.") where T : struct, IParsable<T>
-		{
-			if (value is null)
-			{
-				result = default;
-				Console.WriteLine("Input was leeg. Probeer opnieuw.");
-				return false;
-			}
-			bool valid = T.TryParse(value, null, out result);
-			if (!valid) Console.WriteLine(err);
-			return valid;
-		}
 
-		private static bool TryParse(string? value, out string result, string err = "Input was leeg, probeer opnieuw.")
-		{
-			if (string.IsNullOrEmpty(value))
-			{
-				result = "";
-				Console.WriteLine(err);
-				return false;
-			}
-
-			result = value;
-			return true;
-		}
-
-		private static T Prompt<T>(string prompt, string err = "Ongeldige waarde, probeer opnieuw.") where T : struct, IParsable<T>
-		{
-			bool exit = false;
-			T parsed = default;
-
-			while (!exit)
-			{
-				Console.Write(prompt);
-				exit = TryParse(Console.ReadLine(), out parsed, err);
-			}
-
-			return parsed;
-		}
-
-		private static string Prompt(string prompt, string err = "Input was leeg, probeer opnieuw.")
-		{
-			bool exit = false;
-			string parsed = "";
-
-			while (!exit)
-			{
-				Console.Write(prompt);
-				exit = TryParse(Console.ReadLine(), out parsed, err);
-			}
-
-			return parsed;
-		}
-
-		private static ulong PromptIsbn()
-		{
-			bool exit = false;
-			ulong parsed = 0;
-
-			while (!exit)
-			{
-				Console.Write("ISBN: ");
-				exit = TryParse(Console.ReadLine(), out parsed);
-                try
-                {
-                    if (exit) exit = Book.IsValidIsbn(parsed);
-					if (!exit) Console.WriteLine("Ongeldige ISBN. Probeer opnieuw.");
-                }
-                catch (ArgumentOutOfRangeException e)
-                {
-                    Console.WriteLine(e.Message);
-                    exit = false;
-                }
-			}
-
-			return parsed;
-		}
 	}
 }
