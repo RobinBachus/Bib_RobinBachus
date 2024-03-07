@@ -15,6 +15,8 @@ namespace Bib_RobinBachus
 			bool exit;
 			do exit = ShowMenu(library);
 			while (!exit);
+
+			Console.WriteLine("Bedankt voor uw bezoek, tot de volgende keer!");
 		}
 
 		private static void Init(Library library)
@@ -52,7 +54,7 @@ namespace Bib_RobinBachus
 				File.Create(path).Close();
 			}
 
-            int count = Book.LoadFromCsv(path, library).Count;
+			int count = Book.LoadFromCsv(path, library).Count;
 			Console.WriteLine($"{count} books loaded!");
 		}
 
@@ -73,10 +75,13 @@ namespace Bib_RobinBachus
 			Console.WriteLine("5. Verwijder een boek");
 			Console.WriteLine("6. Toon alle boeken");
 			Console.WriteLine("7. Laad data van bestand");
-			Console.WriteLine("0. Stoppen");
+			Console.WriteLine("\n0. Type exit om te stoppen");
 
-			int choice = PromptRange("\nKeuze", 0, 7, "Ongeldige keuze. Probeer opnieuw.");
-			Console.Clear();
+			(_, int? choice) = PromptRange("\nKeuze", 0, 7, new []{"exit"} , "Ongeldige keuze. Probeer opnieuw.");
+			Console.WriteLine(choice ?? -1);
+			choice ??= 0;
+			Console.WriteLine(choice);
+			//Console.Clear();
 
 			switch (choice)
 			{
@@ -89,7 +94,7 @@ namespace Bib_RobinBachus
 					AddInfoToBook(library);
 					break;
 				case 3:
-					Console.WriteLine(FindBook(library));
+					Console.WriteLine(library.PromptFindBook());
 					break;
 				case 4:
 					SearchBook(library);
@@ -185,7 +190,13 @@ namespace Bib_RobinBachus
 
 		private static void AddInfoToBook(Library library)
 		{
-			Book book = FindBook(library);
+			Book? book = library.PromptFindBook();
+			if (book is null)
+			{
+				Console.WriteLine("Boek niet gevonden.");
+				return;
+			}
+
 			Console.WriteLine("Wat wil je toevoegen?");
 			Console.WriteLine("1. Uitgeefdatum");
 			Console.WriteLine("2. Genre");
@@ -254,19 +265,6 @@ namespace Bib_RobinBachus
 			Console.WriteLine("Book added!\n");
 			Console.WriteLine(book);
 			return true;
-		}
-		
-		private static Book FindBook(Library library)
-		{
-			Book? book = null;
-			while (book is null){
-				string title = Prompt("Titel: ");
-				string author = Prompt("Auteur: ");
-
-				book = library.FindBook(author, title);
-			}
-
-			return book;
 		}
 	}
 }

@@ -15,6 +15,13 @@ namespace Bib_RobinBachus
 			set => name = value;
 		}
 
+		private ConsoleColor? color;
+		public ConsoleColor? Color
+		{
+			get => color;
+			set => color = value;
+		}
+
 		private List<Book> books = new();
 		public List<Book> Books
 		{
@@ -46,16 +53,46 @@ namespace Bib_RobinBachus
 			this.name = name;
 		}
 
+		public Library(string name, ConsoleColor color)
+		{
+			this.name = name;
+			this.color = color;
+		}
+
 		public bool RemoveBook(string isbn)
 		{
 			return 0 != books.RemoveAll(book => book.IsbnNumber == isbn);
 		}
 
+		/// <summary>
+		/// Find a book by asking for the title and author
+		/// </summary>
+		/// <returns>The book if found, null otherwise.</returns>
+		public Book? PromptFindBook()
+		{
+			string title = Prompt("Titel: ");
+			string author = Prompt("Auteur: ");
+
+			return FindBook(author, title);
+		}
+
+
+		/// <summary>
+		/// Finds a book in the library by its ISBN number.
+		/// </summary>
+		/// <param name="isbn">The ISBN number of the book to find.</param>
+		/// <returns>The book if found, null otherwise.</returns>
 		public Book? FindBook(string isbn)
 		{
 			return books.Find(book => book.IsbnNumber == isbn);
 		}
-			
+
+		/// <summary>
+		/// Finds a book in the library by its author and title.
+		/// </summary>
+		/// <param name="author">The author of the book to find.</param>
+		/// <param name="title">The title of the book to find.</param>
+		/// <returns>The book if found, null otherwise.</returns>
 		public Book? FindBook(string author, string title)
 		{
 			List<Book> results = books.FindAll(book => book.Author == author && book.Title == title);

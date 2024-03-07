@@ -47,6 +47,42 @@ namespace Bib_RobinBachus
 			return parsed;
 		}
 
+		public static (string value, T? parsed) PromptRange<T>(string prompt, T min, T max, string[] allowedValues, string err = "Waarde buiten range, probeer opnieuw.") 
+			where T : struct, IParsable<T>, IComparable<T>
+		{
+			// TODO
+			T parsed = null;
+			string value;
+			bool initial = true;
+			do
+			{
+				if (!initial) Console.WriteLine(err);
+					
+				value = Prompt($"{prompt} [{min}-{max}]: ");
+
+				bool parseable = TryParse(value, out T result, err);
+				if (!parseable || (allowedValues.Length > 0 && !allowedValues.Contains(value)))
+				{
+					Console.WriteLine(err);
+					continue;
+				}
+
+				if (!parseable && allowedValues.Contains(value))
+					return (value, null);
+
+				Console.WriteLine(typeof(T));
+
+				initial = false;
+			}
+			while (parsed.CompareTo(min) < 0 || parsed.CompareTo(max) > 0);
+
+			Console.WriteLine(value);
+			Console.WriteLine(parsed);
+
+			return (value, parsed);
+			
+		}
+
 		public static bool PromptBool(string prompt, string def = "y")
 		{
 			prompt += def == "n" ? " (y/N):" : " (Y/n):";

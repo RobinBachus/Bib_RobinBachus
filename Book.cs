@@ -90,8 +90,8 @@ namespace Bib_RobinBachus
 			Price = price;
 			IsbnNumber = isbn;
 
-            library.Books.Add(this);
-        }
+			library.Books.Add(this);
+		}
 
 		public static List<Book> LoadFromCsv(string filePath, Library library)
 		{

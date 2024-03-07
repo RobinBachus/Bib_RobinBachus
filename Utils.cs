@@ -4,6 +4,8 @@
 	{
 		public static bool TryParse<T>(string? value, out T result, string err = "Ongeldige waarde, probeer opnieuw.") where T : struct, IParsable<T>
 		{
+			Console.WriteLine(typeof(T));
+
 			if (value is null)
 			{
 				result = default;
