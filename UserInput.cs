@@ -51,7 +51,7 @@ namespace Bib_RobinBachus
 			where T : struct, IParsable<T>, IComparable<T>
 		{
 			// TODO
-			T parsed = null;
+			T parsed;
 			string value;
 			bool initial = true;
 			do
@@ -60,24 +60,20 @@ namespace Bib_RobinBachus
 					
 				value = Prompt($"{prompt} [{min}-{max}]: ");
 
-				bool parseable = TryParse(value, out T result, err);
-				if (!parseable || (allowedValues.Length > 0 && !allowedValues.Contains(value)))
-				{
-					Console.WriteLine(err);
-					continue;
-				}
-
-				if (!parseable && allowedValues.Contains(value))
-					return (value, null);
-
-				Console.WriteLine(typeof(T));
-
-				initial = false;
-			}
+				bool parseable = TryParse(value, out parsed, "");
+				switch (parseable)
+                {
+                    case false when (allowedValues.Length > 0 && !allowedValues.Contains(value)):
+                        Console.WriteLine(err);
+                        continue;
+                    case false when allowedValues.Contains(value):
+                        return (value, null);
+                    default:
+                        initial = false;
+                        break;
+                }
+            }
 			while (parsed.CompareTo(min) < 0 || parsed.CompareTo(max) > 0);
-
-			Console.WriteLine(value);
-			Console.WriteLine(parsed);
 
 			return (value, parsed);
 			

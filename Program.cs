@@ -8,7 +8,9 @@ namespace Bib_RobinBachus
 
 		public static void Main()
 		{
-			Library library = new("Infernal Forest");
+			Library library = new("Infernal Forest") ;
+
+            Book book = new Book("9789024567897", "De Hobbit", "J.R.R. Tolkien", 12.50, library) {}
 
 			Init(library);
 
@@ -78,10 +80,8 @@ namespace Bib_RobinBachus
 			Console.WriteLine("\n0. Type exit om te stoppen");
 
 			(_, int? choice) = PromptRange("\nKeuze", 0, 7, new []{"exit"} , "Ongeldige keuze. Probeer opnieuw.");
-			Console.WriteLine(choice ?? -1);
 			choice ??= 0;
-			Console.WriteLine(choice);
-			//Console.Clear();
+			Console.Clear();
 
 			switch (choice)
 			{

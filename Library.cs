@@ -96,12 +96,12 @@ namespace Bib_RobinBachus
 		public Book? FindBook(string author, string title)
 		{
 			List<Book> results = books.FindAll(book => book.Author == author && book.Title == title);
+
 			switch (results.Count)
 			{
 				case 1:
 					return results[0];
 				case 0:
-					Console.WriteLine("Geen boeken gevonden");
 					return null;
 			}
 
