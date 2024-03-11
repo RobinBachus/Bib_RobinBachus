@@ -9,9 +9,13 @@
 
   <ItemGroup>
     <None Remove="Data\Books.csv" />
+    <None Remove="Data\BooksBackup.csv" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Data\BooksBackup.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\Books.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
