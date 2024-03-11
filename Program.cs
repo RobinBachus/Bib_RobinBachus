@@ -1,37 +1,36 @@
-﻿using Bib_RobinBachus.ReadingRoom;
+﻿using Bib_RobinBachus.Utils;
 using static Bib_RobinBachus.Utils.UserInput;
 using static Bib_RobinBachus.Utils.Utils;
 
 namespace Bib_RobinBachus
 {
 	/// <summary>
-	/// Represents the main program class.
+	///     Represents the main program class.
 	/// </summary>
 	internal class Program
 	{
 		private const string DEFAULT_PATH = "Data/Books.csv";
 
 		/// <summary>
-		/// The entry point of the program.
+		///     The entry point of the program.
 		/// </summary>
 		public static void Main()
 		{
 			Library library = new("Infernal Forest");
 
-			library.AddMagazine();
-			library.ShowAllMagazines();
-
 			Init(library);
 
 			bool exit;
-			do exit = ShowMenu(library);
-			while (!exit);
+			do
+			{
+				exit = !ShowMenu(library);
+			} while (!exit);
 
 			Console.WriteLine("Bedankt voor uw bezoek, tot de volgende keer!");
 		}
 
 		/// <summary>
-		/// Initializes the library.
+		///     Initializes the library.
 		/// </summary>
 		/// <param name="library">The library object.</param>
 		private static void Init(Library library)
@@ -47,7 +46,7 @@ namespace Bib_RobinBachus
 		}
 
 		/// <summary>
-		/// Loads data from a file into the library.
+		///     Loads data from a file into the library.
 		/// </summary>
 		/// <param name="library">The library object.</param>
 		/// <param name="path">The path to the file.</param>
@@ -61,7 +60,7 @@ namespace Bib_RobinBachus
 		}
 
 		/// <summary>
-		/// Saves the library data to a file.
+		///     Saves the library data to a file.
 		/// </summary>
 		/// <param name="library">The library object.</param>
 		/// <param name="path">The path to the file.</param>
@@ -79,74 +78,34 @@ namespace Bib_RobinBachus
 		}
 
 		/// <summary>
-		/// Shows the menu and handles the user's choice.
+		///     Shows the menu and handles the user's choice.
 		/// </summary>
 		/// <param name="library">The library object.</param>
-		/// <returns>Exit state: true for exit, otherwise false.</returns>
+		/// <returns> <c>false</c> if the user wants to exit the program; otherwise, <c>true</c>.</returns>
 		private static bool ShowMenu(Library library)
 		{
-			Console.WriteLine($"Welkom bij {library.Name}!");
-			Console.WriteLine("Wat wil je doen?\n");
+			Menu menu = new($"Welkom bij {library.Name}! Wat wil je doen?", "\nKeuze", new[] { "exit" });
 
-			Console.WriteLine("1. Voeg een boek toe");
-			Console.WriteLine("2. Voeg info toe aan een boek");
-			Console.WriteLine("3. Toon alle info van een boek");
-			Console.WriteLine("4. Zoek boeken");
-			Console.WriteLine("5. Verwijder een boek");
-			Console.WriteLine("6. Toon alle boeken");
-			Console.WriteLine("7. Laad data van bestand");
-			Console.WriteLine("8. Exporteer boeken naar csv");
-
-			Console.WriteLine("\n0. Type exit om te stoppen");
-
-			(_, int? choice) = PromptRange("\nKeuze", 0, 8, new[] { "exit" }, "Ongeldige keuze. Probeer opnieuw.");
-			choice ??= 0;
-			Console.Clear();
-
-			switch (choice)
+			menu.AddMenuItem("Voeg een boek toe", () => MakeBook(library));
+			menu.AddMenuItem("Voeg info toe aan een boek", () => AddInfoToBook_(library));
+			menu.AddMenuItem("Toon alle info van een boek",
+				() => Console.WriteLine(library.PromptFindBook()?.ToString() ?? "Boek niet gevonden"));
+			menu.AddMenuItem("Zoek boeken", () => SearchBook(library));
+			menu.AddMenuItem("Verwijder een boek", () =>
 			{
-				case 1:
-					bool exit;
-					do exit = MakeBook(library);
-					while (!exit);
-					break;
-				case 2:
-					AddInfoToBook(library);
-					break;
-				case 3:
-					Console.WriteLine(library.PromptFindBook()?.ToString() ?? "Boek niet gevonden");
-					break;
-				case 4:
-					SearchBook(library);
-					break;
-				case 5:
-					string? isbn = PromptIsbn();
-					if (isbn is null) break; // PromptIsbn() returns null if the user wants to cancel the operation
-					Console.WriteLine(library.RemoveBook(isbn) ? "Boek verwijderd." : "Boek niet gevonden.");
-					break;
-				case 6:
-					library.Books.ForEach(b => Console.WriteLine(b.Header));
-					break;
-				case 7:
-					LoadData(library);
-					break;
-				case 8:
-					SaveData(library, DEFAULT_PATH);
-					break;
-				case 0:
-					return true;
-				default:
-					Console.WriteLine("Ongeldige keuze. Probeer opnieuw.");
-					break;
-			}
+				string? isbn = PromptIsbn();
+				if (isbn is null) return; // PromptIsbn() returns null if the user wants to cancel the operation
+				Console.WriteLine(library.RemoveBook(isbn) ? "Boek verwijderd." : "Boek niet gevonden.");
+			});
+			menu.AddMenuItem("Toon alle boeken", () => library.Books.ForEach(b => Console.WriteLine(b.Header)));
+			menu.AddMenuItem("Laad data van bestand", () => LoadData(library));
+			menu.AddMenuItem("Exporteer boeken naar csv", () => SaveData(library, DEFAULT_PATH));
 
-			PromptKey();
-
-			return false;
+			return menu.ShowMenu();
 		}
 
 		/// <summary>
-		/// Prompts the user for book details and adds a new book to the library.
+		///     Prompts the user for book details and adds a new book to the library.
 		/// </summary>
 		/// <param name="library">The library object.</param>
 		/// <returns>False if the user wants to cancel the operation, otherwise true.</returns>
@@ -166,11 +125,7 @@ namespace Bib_RobinBachus
 			return true;
 		}
 
-		/// <summary>
-		/// Prompts the user to add additional information to a book.
-		/// </summary>
-		/// <param name="library">The library object.</param>
-		private static void AddInfoToBook(Library library)
+		private static void AddInfoToBook_(Library library)
 		{
 			Book? book = library.PromptFindBook();
 			if (book is null)
@@ -179,77 +134,47 @@ namespace Bib_RobinBachus
 				return;
 			}
 
-			Console.WriteLine("Wat wil je toevoegen?");
-			Console.WriteLine("1. Isbn");
-			Console.WriteLine("2. Genre");
-			Console.WriteLine("3. Type");
-			Console.WriteLine("4. Uitgave jaar");
-			Console.WriteLine("5. Prijs");
-			Console.WriteLine("6. 18+ rating");
-			Console.WriteLine("7. Terug");
+			// This menu will be added to the main menu and will be shown when the chooses to change the book's type
+			Menu typeMenu = new("Kies een type:", "Keuze", new[] { "terug" });
+			typeMenu.AddMenuItem("Hardcover", () => book.Type = "Hardcover");
+			typeMenu.AddMenuItem("Paperback", () => book.Type = "Paperback");
+			typeMenu.AddMenuItem("Kindle", () => book.Type = "Kindle");
 
+			// Create a new menu for the user to choose what to add to the book
+			Menu menu = new("Wat wil je toevoegen?", "Keuze", new[] { "terug" });
 
-			int choice = PromptRange("\nKeuze", 1, 7, "Ongeldige keuze. Probeer opnieuw.");
-			switch (choice)
+			menu.AddMenuItem("AddIsbn", AddIsbn);
+			menu.AddMenuItem("AddGenre", AddGenre);
+			// Add the typeMenu to the main menu
+			menu.AddMenuItem("Type", () => typeMenu.ShowMenu());
+			menu.AddMenuItem("Uitgave jaar", () => { book.PublishDate = Prompt<DateTime>("Uitgave datum: "); });
+			menu.AddMenuItem("Prijs", () => { book.Price = Prompt<double>("Prijs: ", "Ongeldige prijs. Probeer opnieuw."); });
+			menu.AddMenuItem("18+ rating", () => { book.HasMatureRating = PromptBool("Is het boek 18+?"); });
+
+			menu.ShowMenu(true);
+
+			return;
+
+			void AddIsbn()
 			{
-				case 1:
-					string? isbn = PromptIsbn();
-					if (isbn is null) return;
-					book.IsbnNumber = isbn;
-					break;
-				case 2:
-					Console.WriteLine("Kies een genre:");
-					foreach (Genre genre in Enum.GetValues(typeof(Genre)))
-						if (genre is not Genre.None) 
-							Console.WriteLine($"{(int)genre}. {genre}");
+				string? isbn = PromptIsbn();
+				if (isbn is null) return; // PromptIsbn() returns null if the user wants to cancel the operation
+				book.IsbnNumber = isbn;
+			}
 
-					book.Genre = (Genre)PromptRange("Keuze", 0, Enum.GetValues(typeof(Genre)).Length - 2);
-					break;
-				case 3:
-					Console.WriteLine("Kies een type:");
-					Console.WriteLine("1. Hardcover");
-					Console.WriteLine("2. Paperback");
-					Console.WriteLine("3. Kindle");
+			void AddGenre()
+			{
+				Console.WriteLine("Kies een genre:");
+				foreach (Genre genre in Enum.GetValues(typeof(Genre)))
+					if (genre is not Genre.None)
+						Console.WriteLine($"{(int)genre}. {genre}");
 
-					if (!int.TryParse(Console.ReadLine(), out int type))
-					{
-						Console.WriteLine("Ongeldige keuze. Probeer opnieuw.");
-						break;
-					}
-
-					book.Type = type switch
-					{
-						1 => "Hardcover",
-						2 => "Paperback",
-						3 => "Kindle",
-						_ => "Hardcover"
-					};
-					break;
-				case 4:
-					if (!DateTime.TryParse(Console.ReadLine(), out DateTime date))
-					{
-						Console.WriteLine("Ongeldige datum. Probeer opnieuw.");
-						break;
-					}
-
-					book.PublishDate = date;
-					break;
-				case 5:
-					book.Price = Prompt<double>("Prijs: ", "Ongeldige prijs. Probeer opnieuw.");
-					break;
-				case 6:
-					book.HasMatureRating = PromptBool("Is het boek 18+?");
-					break;
-				case 7:
-					return;
-				default:
-					Console.WriteLine("Ongeldige keuze. Probeer opnieuw.");
-					break;
+				book.Genre = (Genre)PromptRange("Keuze", 0, Enum.GetValues(typeof(Genre)).Length - 2);
 			}
 		}
 
 		/// <summary>
-		/// Searches for books based on user input.
+		///     Searches for books based on user input.
 		/// </summary>
 		/// <param name="library">The library object.</param>
 		private static void SearchBook(Library library)
@@ -283,7 +208,7 @@ namespace Bib_RobinBachus
 				case 2:
 					string author = Prompt("Auteur: ");
 
-					List<Book> books = library.FindBooks(author);
+					var books = library.FindBooks(author);
 					if (books.Count == 0)
 					{
 						Console.WriteLine("Geen boeken gevonden");
@@ -312,7 +237,10 @@ namespace Bib_RobinBachus
 
 			return;
 
-			static void ShowHeaders(Book b) => Console.WriteLine(b.Header);
+			static void ShowHeaders(Book b)
+			{
+				Console.WriteLine(b.Header);
+			}
 		}
 	}
 }
