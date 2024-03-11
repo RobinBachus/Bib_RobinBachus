@@ -1,6 +1,6 @@
-﻿using static Bib_RobinBachus.Utils;
+﻿using static Bib_RobinBachus.Utils.Utils;
 
-namespace Bib_RobinBachus
+namespace Bib_RobinBachus.Utils
 {
     /// <summary>
     /// Utility class containing various helper methods for user input.
@@ -60,7 +60,7 @@ namespace Bib_RobinBachus
         /// <param name="max">The maximum value of the range.</param>
         /// <param name="err">The error message to display if the user's input is not within the range.</param>
         /// <returns>The parsed value within the specified range.</returns>
-        public static T PromptRange<T>(string prompt, T min, T max, string err = "Waarde buiten range, probeer opnieuw.") 
+        public static T PromptRange<T>(string prompt, T min, T max, string err = "Waarde buiten range, probeer opnieuw.")
             where T : struct, IParsable<T>, IComparable<T>
         {
             T parsed;

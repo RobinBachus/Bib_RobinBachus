@@ -1,0 +1,156 @@
+Opdracht project OO Programmeren – deel 2
+Werk verder in je project van de eerste opdracht.
+Vul het project aan om ook maandbladen en kranten ter beschikking te stellen in de leeszaal. In de
+leeszaal kan niets worden ontleend.
+Voorzie hiervoor volgende onderdelen:
+
+Abstracte klasse ReadingRoomItem
+Deze klasse heeft volgende properties:
+-
+
+-
+
+-
+
+Title:
+o string
+o Read-Only
+Publisher:
+o string
+Identification:
+o string
+o abstract
+o Read-Only
+Categorie:
+o string
+o abstract
+o Read-Only
+
+Voorzie een constructor met als parameters de titel en de uitgeverij (= de publisher).
+
+Klasse NewsPaper
+Deze klasse erft over van ReadingRoomItem en heeft volgende properties:
+-
+
+-
+
+-
+
+Date:
+o Bevat de datum van de krant
+o DateTime
+Implementatie van Identification:
+o ‘computed property’
+o Wordt opgebouwd uit:
+- 2 of 3 voorletters afhankelijk van de Title van de krant; bijvoorbeeld Gazet Van
+Antwerpen geeft GVA; De Standaard geeft DS. Vul zelf aan met enkele kranten
+(minstens 4).
+- + 2 cijfers voor de dag + 2 cijfers voor de maand + 4 cijfers voor het jaar
+Implementatie van Categorie:
+o ‘computed property’
+o Geeft “Krant”
+
+Voorzie een constructor met als parameters de titel, uitgeverij en datum.
+
+1
+
+Klasse Magazine
+Deze klasse erft over van ReadingRoomItem en heeft volgende properties:
+-
+
+-
+
+-
+
+-
+
+Month:
+o byte
+o Bij het toewijzen van een waarde moet je testen of de maand niet groter is dan 12;
+dan toon je “De maand is maximaal 12”.
+Year:
+o uint
+o Bij het toewijzen van een waarde moet je testen of het jaar niet groter is dan 2500;
+dan toon je “Het jaartal is maximaal 2500”.
+Implementatie van Identification:
+o Wordt opgebouwd uit:
+- 2 of 3 voorletters afhankelijk van de Title van het maandblad; bijvoorbeeld Data
+News geeft DN; National Geographic geeft NG. Vul zelf aan met enkele maandbladen
+(minstens 4).
+- 2 cijfers voor de maand + 4 cijfers voor het jaar
+Implementatie van Categorie:
+o Geeft “Maandblad”
+
+Voorzie een constructor met als parameters de titel, uitgeverij, maand en jaar.
+
+Toevoegingen aan klasse Library
+-
+
+AllReadingRoom:
+o dictionary (read-only) die alle kranten en maandbladen bevat die aanwezig zijn; de
+key is de datum van creatie van het object (moment dat het toegevoegd wordt aan
+de leeszaal) en de value een ReadingRoomItem-object;
+
+Voorzie volgende methodes:
+-
+
+AddNewspaper:
+o void
+o geen parameters
+o Vraag naar de naam, de datum en de uitgeverij van een krant.
+o Maak het object
+o Voeg het object toe aan de dictionary AllReadingRoom
+o Voorbeeld:
+
+2
+
+-
+
+AddMagazine:
+o void
+o geen parameters
+o Vraag naar de naam, maand, jaar en uitgeverij van een maandblad.
+o Maak het object
+o Voeg het object toe aan de dictionary AllReadingRoom
+o
+
+-
+
+ShowAllMagazines:
+o void
+o geen parameters
+o Deze toont elk maandblad in de leeszaal (terug te vinden in AllReadingRoom).
+o Voorbeeld:
+
+-
+
+ShowAllNewspapers:
+o void
+o geen parameters
+o Deze toont elke krant in de leeszaal (terug te vinden in AllReadingRoom).
+o Voorbeeld:
+
+-
+
+-
+
+AcquisitionsReadingRoomToday:
+o Toont de aanwinsten van de huidige dag met de titel en de identificatie
+
+Keuzemenu
+Vul het keuzemenu aan om:
+-
+
+Een krant of maandblad toe te voegen
+Alle kranten te tonen
+Alle maandbladen te tonen
+De aanwinsten van de leeszaal op te vragen
+
+3
+
+Klassediagrammen
+Voeg een aangepast overzicht toe met alle klassediagrammen.
+
+4
+
+

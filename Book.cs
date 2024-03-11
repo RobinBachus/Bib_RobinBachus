@@ -68,7 +68,7 @@ namespace Bib_RobinBachus
             set => publishDate = value;
         }
 
-        private Genre genre = Genre.Misc;
+        private Genre genre = Genre.None;
         public Genre Genre
         {
             get => genre;
