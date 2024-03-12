@@ -135,20 +135,20 @@ namespace Bib_RobinBachus.Utils
 		///     If the user's input is not recognized, it returns the default value.
 		/// </summary>
 		/// <param name="prompt">The prompt message to display to the user.</param>
-		/// <param name="def">The default value to return if the user's input is not recognized.</param>
+		/// <param name="default">The default value to return if the user's input is not recognized.</param>
 		/// <returns>The boolean value based on the user's input.</returns>
-		public static bool PromptBool(string prompt, string def = "y")
+		public static bool PromptBool(string prompt, string @default = "y")
 		{
-			prompt += def == "n" ? " (y/N):" : " (Y/n):";
+			prompt += @default == "n" ? " (y/N):" : " (Y/n):";
 			Console.Write(prompt);
-			string input = Console.ReadLine() ?? def;
+			string input = Console.ReadLine() ?? @default;
 			return input.ToLower() switch
 			{
 				"y" => true,
 				"yes" => true,
 				"n" => false,
 				"no" => false,
-				_ => def == "y"
+				_ => @default == "y"
 			};
 		}
 

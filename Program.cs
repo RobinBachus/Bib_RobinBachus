@@ -1,4 +1,5 @@
-﻿using Bib_RobinBachus.Utils;
+﻿using System.Globalization;
+using Bib_RobinBachus.Utils;
 using static Bib_RobinBachus.Utils.UserInput;
 using static Bib_RobinBachus.Utils.Utils;
 
@@ -16,6 +17,8 @@ namespace Bib_RobinBachus
 		/// </summary>
 		public static void Main()
 		{
+			CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+
 			Library library = new("Infernal Forest");
 
 			Init(library);
@@ -72,7 +75,7 @@ namespace Bib_RobinBachus
 			string finalPath = Book.SaveToCsv(path, library);
 			Console.WriteLine($"Data opgeslagen naar {finalPath}");
 
-			bool open = PromptBool("Wil je het bestand openen?");
+			bool open = PromptBool("Wil je het bestand openen?", "n");
 			if (open) OpenWithDefaultProgram(finalPath);
 			Console.WriteLine("");
 		}
@@ -87,7 +90,7 @@ namespace Bib_RobinBachus
 			Menu menu = new($"Welkom bij {library.Name}! Wat wil je doen?", "\nKeuze", new[] { "exit" });
 
 			menu.AddMenuItem("Voeg een boek toe", () => MakeBook(library));
-			menu.AddMenuItem("Voeg info toe aan een boek", () => AddInfoToBook_(library));
+			menu.AddMenuItem("Voeg info toe aan een boek", () => AddInfoToBook(library));
 			menu.AddMenuItem("Toon alle info van een boek",
 				() => Console.WriteLine(library.PromptFindBook()?.ToString() ?? "Boek niet gevonden"));
 			menu.AddMenuItem("Zoek boeken", () => SearchBook(library));
@@ -101,7 +104,7 @@ namespace Bib_RobinBachus
 			menu.AddMenuItem("Laad data van bestand", () => LoadData(library));
 			menu.AddMenuItem("Exporteer boeken naar csv", () => SaveData(library, DEFAULT_PATH));
 
-			return menu.ShowMenu();
+			return menu.ShowMenu(true);
 		}
 
 		/// <summary>
@@ -125,7 +128,7 @@ namespace Bib_RobinBachus
 			return true;
 		}
 
-		private static void AddInfoToBook_(Library library)
+		private static void AddInfoToBook(Library library)
 		{
 			Book? book = library.PromptFindBook();
 			if (book is null)
@@ -143,15 +146,15 @@ namespace Bib_RobinBachus
 			// Create a new menu for the user to choose what to add to the book
 			Menu menu = new("Wat wil je toevoegen?", "Keuze", new[] { "terug" });
 
-			menu.AddMenuItem("AddIsbn", AddIsbn);
-			menu.AddMenuItem("AddGenre", AddGenre);
+			menu.AddMenuItem("Isbn", AddIsbn);
+			menu.AddMenuItem("Genre", AddGenre);
 			// Add the typeMenu to the main menu
 			menu.AddMenuItem("Type", () => typeMenu.ShowMenu());
 			menu.AddMenuItem("Uitgave jaar", () => { book.PublishDate = Prompt<DateTime>("Uitgave datum: "); });
 			menu.AddMenuItem("Prijs", () => { book.Price = Prompt<double>("Prijs: ", "Ongeldige prijs. Probeer opnieuw."); });
 			menu.AddMenuItem("18+ rating", () => { book.HasMatureRating = PromptBool("Is het boek 18+?"); });
 
-			menu.ShowMenu(true);
+			menu.ShowMenu();
 
 			return;
 
@@ -179,68 +182,64 @@ namespace Bib_RobinBachus
 		/// <param name="library">The library object.</param>
 		private static void SearchBook(Library library)
 		{
-			Console.WriteLine("Waarop wil je zoeken?");
-			Console.WriteLine("1. ISBN");
-			Console.WriteLine("2. Auteur");
-			Console.WriteLine("3. Prijs range");
+			Menu menu = new("Waarop wil je zoeken?", "Keuze", new[] { "terug" });
 
+			menu.AddMenuItem("ISBN", IsbnSearch);
+			menu.AddMenuItem("Auteur", AuthorSearch);
+			menu.AddMenuItem("Prijs range", PriceSearch);
 
-			int choice = PromptRange("\nKeuze", 1, 3, "Ongeldige keuze, probeer opnieuw.");
-			switch (choice)
-			{
-				case 1:
-					string? isbn = PromptIsbn();
-					if (isbn is null)
-					{
-						Console.WriteLine("Aanvraag afgebroken");
-						return;
-					}
-
-					Book? book = library.FindBook(isbn);
-					if (book is null)
-					{
-						Console.WriteLine("Boek niet gevonden.");
-						return;
-					}
-
-					Console.WriteLine(book.Header);
-					break;
-				case 2:
-					string author = Prompt("Auteur: ");
-
-					var books = library.FindBooks(author);
-					if (books.Count == 0)
-					{
-						Console.WriteLine("Geen boeken gevonden");
-						return;
-					}
-
-					books.ForEach(ShowHeaders);
-					break;
-				case 3:
-					double minPrice = PromptRange("Minimumprijs: ", library.LowestPrice, library.HighestPrice);
-					double maxPrice = PromptRange("Maximumprijs: ", minPrice, library.HighestPrice);
-
-					books = library.FindBooks(minPrice, maxPrice);
-					if (books.Count == 0)
-					{
-						Console.WriteLine("Geen boeken gevonden");
-						return;
-					}
-
-					books.ForEach(ShowHeaders);
-					break;
-				default:
-					Console.WriteLine("Ongeldige keuze. Probeer opnieuw.");
-					break;
-			}
-
+			menu.ShowMenu();
+			
 			return;
 
-			static void ShowHeaders(Book b)
+			void IsbnSearch()
 			{
-				Console.WriteLine(b.Header);
+				string? isbn = PromptIsbn();
+				if (isbn is null)
+				{
+					Console.WriteLine("Aanvraag afgebroken");
+					return;
+				}
+
+				Book? book = library.FindBook(isbn);
+				if (book is null)
+				{
+					Console.WriteLine("Boek niet gevonden.");
+					return;
+				}
+
+				Console.WriteLine(book.Header);
 			}
+
+			void AuthorSearch()
+			{
+				string author = Prompt("Auteur: ");
+
+				List<Book> books = library.FindBooks(author);
+				if (books.Count == 0)
+				{
+					Console.WriteLine("Geen boeken gevonden");
+					return;
+				}
+
+				books.ForEach(b => Console.WriteLine(b.Header));
+			}
+
+			void PriceSearch()
+			{
+				double minPrice = PromptRange("Minimumprijs: ", library.LowestPrice, library.HighestPrice);
+				double maxPrice = PromptRange("Maximumprijs: ", minPrice, library.HighestPrice);
+
+				List<Book> books = library.FindBooks(minPrice, maxPrice);
+				if (books.Count == 0)
+				{
+					Console.WriteLine("Geen boeken gevonden");
+					return;
+				}
+
+				books.ForEach(b => Console.WriteLine(b.Header));
+			}
+
 		}
 	}
 }
